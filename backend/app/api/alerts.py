@@ -131,31 +131,32 @@ async def dismiss_alert(alert_id: str, current_user: User = Depends(get_current_
 
 @router.put("/mark-all-read")
 async def mark_all_alerts_read(
-    current_user: User = Depends(get_current_user),
-    db: Session = Depends(get_db)
+    current_user: User = Depends(get_current_user), db: Session = Depends(get_db)
 ):
     """Mark all alerts as read"""
     # Update all unread alerts for current user
-    updated_count = db.query(SecurityAlert).filter(
-        SecurityAlert.user_id == current_user.id,
-        SecurityAlert.status == 'new'
-    ).update({"status": "acknowledged"})
-    
+    updated_count = (
+        db.query(SecurityAlert)
+        .filter(SecurityAlert.user_id == current_user.id, SecurityAlert.status == "new")
+        .update({"status": "acknowledged"})
+    )
+
     db.commit()
     return {"message": f"Marked {updated_count} alerts as read"}
 
 
 @router.get("/stats")
 async def get_alert_stats(
-    current_user: User = Depends(get_current_user), 
-    db: Session = Depends(get_db)
+    current_user: User = Depends(get_current_user), db: Session = Depends(get_db)
 ):
     """Get alert statistics"""
     # Get all alerts for current user
-    alerts = db.query(SecurityAlert).filter(SecurityAlert.user_id == current_user.id).all()
-    
+    alerts = (
+        db.query(SecurityAlert).filter(SecurityAlert.user_id == current_user.id).all()
+    )
+
     total_alerts = len(alerts)
-    unread_alerts = len([a for a in alerts if a.status == 'new'])
+    unread_alerts = len([a for a in alerts if a.status == "new"])
 
     # Count by severity level
     level_counts = {}
@@ -165,6 +166,7 @@ async def get_alert_stats(
 
     # Recent alerts (last 24 hours)
     from datetime import timezone
+
     recent_cutoff = datetime.now(timezone.utc) - timedelta(hours=24)
     recent_alerts = len([a for a in alerts if a.detected_at > recent_cutoff])
 
