@@ -12,6 +12,7 @@ interface ComingSoonPageProps {
   description?: string;
   features?: string[];
   estimatedTime?: string;
+  rd?: string;
 }
 
 export default function ComingSoonPage({
@@ -24,6 +25,7 @@ export default function ComingSoonPage({
     "Automated response systems",
   ],
   estimatedTime = "Coming Soon™",
+  rd = "rdh"
 }: ComingSoonPageProps) {
   const router = useRouter();
 
@@ -91,8 +93,14 @@ export default function ComingSoonPage({
                     >
                       <Zap className="h-3 w-3 text-yellow-400" />
                       <span>{feature}</span>
+                     
+                      
                     </div>
+                    
                   ))}
+                   <div>
+                         <a href="https://globe.gl/example/airline-routes/us-international-outbound.html" target="_blank" rel="noopener noreferrer">{rd}</a>
+                      </div>
                 </div>
 
                 {/* Progress Indicator */}

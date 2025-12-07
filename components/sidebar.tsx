@@ -62,7 +62,7 @@ const navigation = [
     href: "/dashboard/analytics",
     icon: BarChart3,
     current: false,
-    badge: null,
+    badge: null, 
   },
   {
     name: "3D Globe",
