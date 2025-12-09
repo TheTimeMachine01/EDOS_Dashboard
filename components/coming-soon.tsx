@@ -25,7 +25,7 @@ export default function ComingSoonPage({
     "Automated response systems",
   ],
   estimatedTime = "Coming Soon™",
-  rd = "rdh"
+  
 }: ComingSoonPageProps) {
   const router = useRouter();
 
@@ -98,9 +98,9 @@ export default function ComingSoonPage({
                     </div>
                     
                   ))}
-                   <div>
+                   {/* <div>
                          <a href="https://globe.gl/example/airline-routes/us-international-outbound.html" target="_blank" rel="noopener noreferrer">{rd}</a>
-                      </div>
+                      </div> */}
                 </div>
 
                 {/* Progress Indicator */}

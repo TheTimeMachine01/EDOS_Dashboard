@@ -19,6 +19,7 @@
 // }
 "use client";
 
+import { DashboardLayout } from "@/components/dashboard-layout";
 import { useState, useEffect } from "react";
 import {
   LineChart,
@@ -99,7 +100,8 @@ export default function NetworkPage() {
   }, []);
 
   return (
-    <div
+    <DashboardLayout>
+      <div
       style={{
         minHeight: "100vh",
         background: "#0f172a",
@@ -158,5 +160,7 @@ export default function NetworkPage() {
         </div>
       </div>
     </div>
+    </DashboardLayout>
+    
   );
 }
