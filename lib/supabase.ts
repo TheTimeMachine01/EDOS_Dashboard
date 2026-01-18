@@ -1,7 +1,10 @@
-import { createClient } from "@supabase/supabase-js";
+/**
+ * This file previously contained Supabase client initialization.
+ * The application has migrated to JWT-based authentication with a Spring Boot backend.
+ * 
+ * See lib/api-client.ts for the HTTP client with JWT interceptors.
+ * See lib/api.ts for centralized API route definitions.
+ */
 
-const supabaseUrl = "https://fekiwfmrimfkkskjmldt.supabase.co";
-const supabaseAnonKey =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZla2l3Zm1yaW1ma2tza2ptbGR0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM2MzcwMzksImV4cCI6MjA3OTIxMzAzOX0.WReyPdElXe8jcHXPjZgD2hnohZsIYGQ5E0SXZIpSrsU";
+// Supabase has been removed from this project
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);

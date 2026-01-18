@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Shield, Terminal, Code, Activity, Lock, ArrowRight, CheckCircle, AlertTriangle } from "lucide-react";
+import { Shield, Terminal, Activity, Lock, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -12,19 +12,44 @@ import { useAuth } from "@/components/auth-context";
 export default function Home() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authMode, setAuthMode] = useState<"login" | "signup">("login");
-  const [threatCount, setThreatCount] = useState(847329);
+  const { isAuthenticated, loading } = useAuth();
+
+  const [threatCount, setThreatCount] = useState(0);
+
+  useEffect(() => {
+  setThreatCount(847329); // Set the actual starting number only on the client
+  const interval = setInterval(() => {
+    setThreatCount((prev) => prev + Math.floor(Math.random() * 5) + 1);
+  }, 3000);
+  return () => clearInterval(interval);
+}, []);
+
   const [terminalText, setTerminalText] = useState("");
   const [currentLineIndex, setCurrentLineIndex] = useState(0);
-  const { user, loading } = useAuth();
   const router = useRouter();
 
-  // Redirect to dashboard if already authenticated
+  // Redirect to dashboard if session is valid from Spring Boot backend
   useEffect(() => {
-    if (user && !loading) {
-      console.log("🏠 HomePage: User authenticated, redirecting to dashboard");
+    if (isAuthenticated && !loading) {
       router.push("/dashboard");
     }
-  }, [user, loading, router]);
+  }, [isAuthenticated, loading, router]);
+
+  const handleAuthClick = (mode: "login" | "signup") => {
+    setAuthMode(mode);
+    setIsAuthModalOpen(true);
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-black text-green-400 font-mono flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-green-500 mx-auto mb-4"></div>
+          <div className="text-xl">$ authenticating with security middleware...</div>
+        </div>
+      </div>
+    );
+  }
 
   const terminalLines = [
     "$ sudo systemctl status edos-shield",
@@ -39,52 +64,36 @@ export default function Home() {
   ];
 
   // Live threat counter
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setThreatCount((prev) => prev + Math.floor(Math.random() * 5) + 1);
-    }, 3000);
-    return () => clearInterval(interval);
-  }, []);
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     setThreatCount((prev) => prev + Math.floor(Math.random() * 5) + 1);
+  //   }, 3000);
+  //   return () => clearInterval(interval);
+  // }, []);
 
   // Terminal typing animation
-  useEffect(() => {
-    if (currentLineIndex < terminalLines.length) {
-      const currentLine = terminalLines[currentLineIndex];
-      let charIndex = 0;
+  // useEffect(() => {
+  //   if (currentLineIndex < terminalLines.length) {
+  //     const currentLine = terminalLines[currentLineIndex];
+  //     let charIndex = 0;
 
-      const typeInterval = setInterval(() => {
-        if (charIndex < currentLine.length) {
-          setTerminalText((prev) => prev + currentLine[charIndex]);
-          charIndex++;
-        } else {
-          clearInterval(typeInterval);
-          setTimeout(() => {
-            setTerminalText((prev) => prev + "\n");
-            setCurrentLineIndex((prev) => prev + 1);
-          }, 500);
-        }
-      }, 30);
+  //     const typeInterval = setInterval(() => {
+  //       if (charIndex < currentLine.length) {
+  //         setTerminalText((prev) => prev + currentLine[charIndex]);
+  //         charIndex++;
+  //       } else {
+  //         clearInterval(typeInterval);
+  //         setTimeout(() => {
+  //           setTerminalText((prev) => prev + "\n");
+  //           setCurrentLineIndex((prev) => prev + 1);
+  //         }, 500);
+  //       }
+  //     }, 30);
 
-      return () => clearInterval(typeInterval);
-    }
-  }, [currentLineIndex]);
+  //     return () => clearInterval(typeInterval);
+  //   }
+  // }, [currentLineIndex]);
 
-  const handleAuthClick = (mode: "login" | "signup") => {
-    setAuthMode(mode);
-    setIsAuthModalOpen(true);
-  };
-
-  // Show loading state
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-black text-green-400 font-mono flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-green-500 mx-auto mb-4"></div>
-          <div className="text-xl">$ initializing security protocols...</div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-black text-green-400 font-mono overflow-hidden">
@@ -104,7 +113,7 @@ export default function Home() {
       <nav className="relative z-10 flex justify-between items-center p-6 md:p-8 border-b border-green-500/20">
         <div className="flex items-center space-x-3">
           <Shield className="h-8 w-8 text-green-400" />
-          <span className="text-2xl font-bold text-green-400">[root@edos-shield ~]#</span>
+          <span className="text-2xl font-bold">[root@edos-shield ~]#</span>
         </div>
         <div className="flex space-x-4">
           <Button
@@ -124,85 +133,29 @@ export default function Home() {
       </nav>
 
       {/* Hero Section */}
-      <main className="relative z-10 px-6 md:px-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid lg:grid-cols-2 gap-16 items-center mb-20">
-            {/* Left Column - Title */}
-            <div className="space-y-8">
-              <div>
-                <Badge
-                  variant="secondary"
-                  className="bg-green-500/20 text-green-300 border-green-500/30 px-4 py-2 mb-6 font-mono"
-                >
-                  [SYSTEM STATUS: ACTIVE]
-                </Badge>
-                <h1 className="text-4xl md:text-6xl font-bold leading-tight text-green-400 mb-6">
-                  EDoS Detection
-                  <br />
-                  <span className="text-white">& Response System</span>
-                </h1>
-                <p className="text-lg text-gray-300 leading-relaxed font-mono">
-                  Military-grade DDoS protection system with real-time threat detection, automated response protocols,
-                  and comprehensive security monitoring. Built for security professionals who demand precision.
-                </p>
-              </div>
-
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Button
-                  size="lg"
-                  className="bg-green-500 text-black hover:bg-green-400 font-mono font-bold px-8 py-4 text-lg"
-                  onClick={() => handleAuthClick("signup")}
-                >
-                  ./initialize --setup
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Button>
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="border-green-500 text-green-400 hover:bg-green-500 hover:text-black font-mono px-8 py-4 text-lg"
-                  onClick={() => handleAuthClick("login")}
-                >
-                  ./demo --live
-                </Button>
-              </div>
-            </div>
-
-            {/* Right Column - Stats */}
-            <div className="space-y-6">
-              <Card className="bg-gray-900 border-green-500/30">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="text-green-400 font-mono">[THREATS_BLOCKED]</span>
-                    <Badge className="bg-red-500/20 text-red-300 border-red-500/30 font-mono">LIVE</Badge>
-                  </div>
-                  <div className="text-3xl font-bold text-white font-mono">{threatCount.toLocaleString()}</div>
-                  <div className="text-sm text-gray-400 font-mono">attacks neutralized today</div>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-gray-900 border-green-500/30">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="text-green-400 font-mono">[RESPONSE_TIME]</span>
-                    <Badge className="bg-green-500/20 text-green-300 border-green-500/30 font-mono">OPTIMAL</Badge>
-                  </div>
-                  <div className="text-3xl font-bold text-white font-mono">&lt; 50ms</div>
-                  <div className="text-sm text-gray-400 font-mono">average detection latency</div>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-gray-900 border-green-500/30">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="text-green-400 font-mono">[ACCURACY_RATE]</span>
-                    <Badge className="bg-blue-500/20 text-blue-300 border-blue-500/30 font-mono">ML</Badge>
-                  </div>
-                  <div className="text-3xl font-bold text-white font-mono">99.97%</div>
-                  <div className="text-sm text-gray-400 font-mono">threat classification accuracy</div>
-                </CardContent>
-              </Card>
+      <main className="relative z-10 px-6 max-w-7xl mx-auto pt-20 md:px-8">
+        <div className="grid lg:grid-cols-2 gap-16 items-center">
+          {/* Left Column - Title */}
+          <div className="space-y-8">
+            <Badge
+              className="bg-green-500/20 text-green-300 border-green-500/30">[SYSTEM STATUS: ACTIVE]</Badge>
+            <h1 className="text-4xl md:text-6xl font-bold leading-tight text-green-400 mb-6">EDoS Detection<br /><span className="text-white">& Response System</span></h1>
+            <p className="text-lg text-gray-300">Self-hosted DDoS protection system integrated with Spring Security for precision threat management.</p>
+            <div className="flex gap-4">
+              <Button size="lg" className="bg-green-500 text-black font-bold" onClick={() => handleAuthClick("signup")}>./initialize --setup <ArrowRight className="ml-2 h-5 w-5" /></Button>
             </div>
           </div>
+
+          {/* Right Column - Stats */}
+          <div className="space-y-6">
+             {/* Dynamic cards could be added here representing live backend status */}
+             <Card className="bg-gray-900 border-green-500/30 p-6">
+                <div className="text-green-400 mb-2">[CONNECTION_MODE]</div>
+                <div className="text-2xl font-bold text-white">SPRING_SECURITY_JWT</div>
+                <div className="text-sm text-gray-400 mt-2">Authenticated via custom Middleware</div>
+             </Card>
+          </div>
+        </div>
 
           {/* System Modules */}
           <div className="mb-20">
@@ -391,7 +344,6 @@ export default function Home() {
               </div>
             </div>
           </div>
-        </div>
       </main>
 
       {/* Auth Modal */}

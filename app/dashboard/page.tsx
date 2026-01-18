@@ -33,14 +33,14 @@ export default function Dashboard() {
                 <div>
                   <h1 className="text-xl font-bold text-green-400">[SECURITY-DASHBOARD] Overview</h1>
                   <p className="text-sm text-green-600">
-                    root@{user?.email?.split("@")[0] || "user"} | clearance: admin | session: active
+                    root@{user?.email?.split("@")[0] || "user"} | clearance: {user?.roles?.[0]?.name?.toLowerCase() || "user"} | session: active
                   </p>
                 </div>
               </div>
 
               <div className="flex items-center space-x-4">
                 <Badge className="bg-green-500/20 text-green-300 border-green-500/30">
-                  Welcome, {user?.user_metadata?.full_name || user?.user_metadata?.display_name || user?.email}
+                  Welcome, {user?.name || user?.email}
                 </Badge>
               </div>
             </div>

@@ -4,10 +4,10 @@ import { useAuth } from "@/components/auth-context";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Terminal, User, Mail, Clock, Shield } from "lucide-react";
+import { Terminal, User, Mail, Shield } from "lucide-react";
 
 export default function AuthTestPage() {
-  const { user, session, loading, signOut, isAuthenticated } = useAuth();
+  const { user, loading, signOut, isAuthenticated } = useAuth();
 
   if (loading) {
     return (
@@ -28,7 +28,7 @@ export default function AuthTestPage() {
             <Terminal className="h-8 w-8 text-green-400" />
             <h1 className="text-2xl font-mono text-green-400">root@edos-shield: ~/auth-test</h1>
           </div>
-          <p className="text-green-600 font-mono"># Testing Supabase Authentication System</p>
+          <p className="text-green-600 font-mono"># Testing JWT Authentication System</p>
         </div>
 
         <Card className="bg-gray-900 border-green-500/30 text-white">
@@ -70,32 +70,16 @@ export default function AuthTestPage() {
 
                     <div className="flex items-center space-x-2 text-sm">
                       <User className="h-4 w-4 text-green-400" />
-                      <span className="text-green-600 font-mono">NAME:</span>
+                      <span className="text-green-600 font-mono">USERNAME:</span>
                       <span className="text-white font-mono">
-                        {user.user_metadata?.full_name || user.user_metadata?.display_name || "N/A"}
+                        {user.username || user.user_metadata?.full_name || "N/A"}
                       </span>
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <div className="flex items-center space-x-2 text-sm">
-                      <Clock className="h-4 w-4 text-green-400" />
-                      <span className="text-green-600 font-mono">CREATED:</span>
-                      <span className="text-white font-mono text-xs">{new Date(user.created_at).toLocaleString()}</span>
                     </div>
 
                     <div className="flex items-center space-x-2 text-sm">
                       <Shield className="h-4 w-4 text-green-400" />
-                      <span className="text-green-600 font-mono">PROVIDER:</span>
-                      <span className="text-white font-mono">{user.app_metadata?.provider || "email"}</span>
-                    </div>
-
-                    <div className="flex items-center space-x-2 text-sm">
-                      <Clock className="h-4 w-4 text-green-400" />
-                      <span className="text-green-600 font-mono">LAST_SIGN_IN:</span>
-                      <span className="text-white font-mono text-xs">
-                        {user.last_sign_in_at ? new Date(user.last_sign_in_at).toLocaleString() : "N/A"}
-                      </span>
+                      <span className="text-green-600 font-mono">ROLE:</span>
+                      <span className="text-white font-mono">{user.role || "user"}</span>
                     </div>
                   </div>
                 </div>
@@ -127,17 +111,26 @@ export default function AuthTestPage() {
           </CardContent>
         </Card>
 
-        {/* Session Details */}
-        {session && (
+        {/* Token Information */}
+        {isAuthenticated && (
           <Card className="bg-gray-900 border-green-500/30 text-white">
             <CardHeader>
-              <CardTitle className="text-green-400 font-mono">Session Information</CardTitle>
-              <CardDescription className="text-green-600 font-mono"># Raw session data from Supabase</CardDescription>
+              <CardTitle className="text-green-400 font-mono">Token Information</CardTitle>
+              <CardDescription className="text-green-600 font-mono"># JWT Tokens stored in localStorage</CardDescription>
             </CardHeader>
-            <CardContent>
-              <pre className="bg-black p-4 rounded text-xs text-green-400 font-mono overflow-auto max-h-96">
-                {JSON.stringify(session, null, 2)}
-              </pre>
+            <CardContent className="space-y-3">
+              <div>
+                <p className="text-green-400 font-mono text-sm mb-2">Access Token (first 50 chars):</p>
+                <p className="bg-black p-3 rounded text-xs text-green-300 font-mono break-all">
+                  {localStorage.getItem("accessToken")?.substring(0, 50)}...
+                </p>
+              </div>
+              <div>
+                <p className="text-green-400 font-mono text-sm mb-2">Refresh Token Exists:</p>
+                <p className="bg-black p-3 rounded text-xs text-green-300 font-mono">
+                  {localStorage.getItem("refreshToken") ? "✓ Yes" : "✗ No"}
+                </p>
+              </div>
             </CardContent>
           </Card>
         )}

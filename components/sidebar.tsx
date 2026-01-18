@@ -124,7 +124,7 @@ export function Sidebar({ className }: SidebarProps) {
       router.push("/");
     } catch (error) {
       console.error("❌ Sidebar: Logout error:", error);
-      // Force redirect even if Supabase logout fails
+      // Force redirect to home even if logout fails
       console.log("🔄 Sidebar: Force redirecting to home...");
       router.push("/");
     }
@@ -253,7 +253,7 @@ export function Sidebar({ className }: SidebarProps) {
           <div className="text-xs text-green-500 font-mono">
             <div>{user.email}</div>
             <div className="text-green-600">clearance: {user.user_metadata?.full_name ? "admin" : "user"}</div>
-            <div className="text-green-600 text-[10px]">auth: supabase</div>
+            <div className="text-green-600 text-[10px]">auth: jwt</div>
           </div>
         </div>
       )}

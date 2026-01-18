@@ -10,20 +10,20 @@ interface AuthGuardProps {
 }
 
 export function AuthGuard({ children, fallback }: AuthGuardProps) {
-  const { user, loading, session } = useAuth();
+  const { user, loading, isAuthenticated } = useAuth();
   const [hasRedirected, setHasRedirected] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
     // Only redirect if we're certain there's no authentication
-    if (!loading && !user && !session && !hasRedirected) {
-      console.log("🔐 AuthGuard: No user/session found, redirecting to home");
+    if (!loading && !isAuthenticated && !hasRedirected) {
+      console.log("🔐 AuthGuard: User not authenticated, redirecting to home");
       setHasRedirected(true);
       router.push("/");
-    } else if (user && session) {
+    } else if (isAuthenticated && user) {
       console.log("🔐 AuthGuard: User authenticated, allowing access");
     }
-  }, [user, session, loading, router, hasRedirected]);
+  }, [isAuthenticated, user, loading, router, hasRedirected]);
 
   if (loading) {
     return (
@@ -39,11 +39,12 @@ export function AuthGuard({ children, fallback }: AuthGuardProps) {
     );
   }
 
-  // If no user and not loading, we should have redirected already
-  if (!user || !session) {
+  // If not authenticated and not loading, we should have redirected already
+  if (!isAuthenticated) {
     return (
       <div className="min-h-screen bg-black text-green-400 font-mono flex items-center justify-center">
         <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-green-500 mx-auto mb-4"></div>
           <div className="text-xl">$ redirecting to authentication...</div>
         </div>
       </div>
